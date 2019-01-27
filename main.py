@@ -1,9 +1,13 @@
 import pyrebase 
 import threading
 import time
+from Library import *
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
 
 def sendmessage(message,target):
-        db.child(target).push({"message": message} , user['idToken'])
+        message=encryptmessage(message, public_key)
+        db.child(target).push({"message": str(message)} , user['idToken'])
 def pullfunction():
         while 1:
                 time.sleep(1)
@@ -17,7 +21,16 @@ def pullfunction():
                         for i in pullkeys:
                                 db.child(usrname.replace("@","_").replace(".",",")).child(i).remove()
                         for i in range(len(pulldata)):
-                                print([message for message in pulldata[i].values()][0])
+                                print([decryptmessage(private_key, bytes(message)) for message in pulldata[i].values()][0])
+
+
+with open("key2.pem", "rb") as key_file:
+    private_key = serialization.load_pem_private_key(
+        key_file.read(),
+        password=b'OhShit',
+        backend=default_backend()
+    )
+public_key = private_key.public_key()
 
 config = {  "apiKey": "AIzaSyBcqfP5f1AZ2fDq9ktvNQ9MwXGQeD379a8" ,  "authDomain": "secretmessenger-e9bd3.firebaseapp.com",  "databaseURL": "https://secretmessenger-e9bd3.firebaseio.com",  "storageBucket": "secretmessenger-e9bd3.appspot.com"} 
 firebase = pyrebase.initialize_app(config)

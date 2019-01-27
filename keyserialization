@@ -1,0 +1,8 @@
+from cryptography.hazmat.primitives import serialization
+pem = private_key.private_bytes(
+   encoding=serialization.Encoding.PEM,
+   format=serialization.PrivateFormat.PKCS8,
+   encryption_algorithm=serialization.BestAvailableEncryption(b'OhShit')
+)
+pem.splitlines()[0]
+b'-----BEGIN ENCRYPTED PRIVATE KEY-----'
